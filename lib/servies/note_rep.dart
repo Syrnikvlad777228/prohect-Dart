@@ -1,9 +1,93 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
+
 import '../models/note.dart';
 import '../utils/file_helper.dart';
+abstract class  Rep {
+   void add(Note note);
+   void del(int id);
+   List<Note> all();
+   void upd(Note note);
+   Note findId(int id);
+   List<Note> findTag(String tag);
+   List<Note> sortdata();
+   List<Note> sorttitle();
+}
+class Repository extends Rep{
 
+  late final Directory _mainPath;
+
+  void init() async {
+    _mainPath = await getApplicationDocumentsDirectory();
+  }
+
+  Repository(){
+    init();
+  }
+  void _save(Note note){
+     try {
+      final file = File("${_mainPath.path}/${note.id}.json");
+      final String content = jsonEncode(note.toJson());
+      file.writeAsStringSync(content, encoding: utf8); 
+    } catch (e) {
+      print('Ошибка сохранения: $e');
+    }
+  }
+  @override
+  List<Note> all(){
+
+  }
+
+  @override
+  void add(Note note) {
+   _save(note);
+   print('Система: Заметка с ID ${note.id} успешно добавлена.');
+  }
+
+  @override
+  void del(int id) {
+  }
+
+  @override
+  Note findId(int id) {
+    // TODO: implement findId
+    throw UnimplementedError();
+  }
+
+  @override
+  List<Note> findTag(String tag) {
+    // TODO: implement findTag
+    throw UnimplementedError();
+  }
+
+  @override
+  List<Note> sortdata() {
+    // TODO: implement sortdata
+    throw UnimplementedError();
+  }
+
+  @override
+  List<Note> sorttitle() {
+    // TODO: implement sorttitle
+    throw UnimplementedError();
+  }
+
+  @override
+  void upd(Note note) {
+   try {
+     
+   }catch (e) {
+      print('Ошибка сохранения: $e');
+      _save(note); 
+    }
+  }
+  
+}
 class NoteRepository {
   final List<Note> _notes = [];
-
   NoteRepository() {
     _load();
   }
