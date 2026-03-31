@@ -1,5 +1,4 @@
 class Note {
-  // Приватные поля
   int _id;
   String _title;
   String _content;
@@ -7,7 +6,6 @@ class Note {
   bool _isFavorite;
   List<String> _tags;
 
-  // Конструктор
   Note(
     this._id,
     this._title,
@@ -17,7 +15,6 @@ class Note {
     this._tags,
   );
 
-  // Геттеры для доступа к данным
   int get id => _id;
   String get title => _title;
   String get content => _content;
@@ -25,13 +22,11 @@ class Note {
   bool get isFavorite => _isFavorite;
   List<String> get tags => _tags;
 
-  // Сеттеры (позволяют менять данные)
   set title(String value) => _title = value;
   set content(String value) => _content = value;
   set isFavorite(bool value) => _isFavorite = value;
   set tags(List<String> value) => _tags = value;
 
-  //Сериализация: превращаем объект в Map для JSON
   Map<String, dynamic> toJson() {
     return {
       'id': _id,
@@ -43,7 +38,6 @@ class Note {
     };
   }
 
-  //Десериализация: создаем объект из Map (при чтении из файла)
   factory Note.fromJson(Map<String, dynamic> json) {
     return Note(
       json['id'],
