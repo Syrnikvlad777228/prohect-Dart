@@ -3,7 +3,6 @@ import '../lib/models/note.dart';
 import '../lib/servies/note_rep.dart';
 
 void main() {
-  //Создаем экземпляр репозитория
   final repo = NoteRepository();
   bool isRunning = true;
 
@@ -54,8 +53,6 @@ void main() {
     }
   }
 }
-
-// --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ (ИНТЕРФЕЙС) ---
 
 void _showNotes(List<Note> notes) {
   if (notes.isEmpty) {
