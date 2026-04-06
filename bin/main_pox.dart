@@ -1,30 +1,24 @@
 import 'dart:io';
 import '../lib/models/note.dart';
-import '../lib/servies/note_rep.dart';
+import '../lib/servies/note_rep.dart'; // Проверь, чтобы папка называлась именно 'servies
+
 
 void main() {
-  final repo = NoteRepository();
+  // Важно: тип переменной Rep (интерфейс), а реализация Repository
+  final Rep repo = Repository(); 
   bool isRunning = true;
 
-  print('=== ПРИЛОЖЕНИЕ "ЗАМЕТКИ" (V1.0) ===(Избранное в разработке)');
-
+  // Автоматически включаем поддержку UTF-8 в консоли Windows
+  
   while (isRunning) {
-    print('\n--- ГЛАВНОЕ МЕНЮ ---');
-    print('1. Показать все заметки');
-    print('2. Добавить заметку');
-    print('3. Удалить заметку по ID');
-    print('4. Найти заметку по ID');
-    print('5. Редактировать заметку');
-    print('6. Фильтр по тегам');
-    print('7. Сортировка (Дата/Имя)');
-    print('8. Выход');
-    stdout.write('\nВыберите пункт (1-8): ');
-
+    print('\n--- МЕНЮ (ПОФАЙЛОВОЕ ХРАНЕНИЕ) ---');
+    print('1. Все заметки | 2. Добавить | 3. Удалить | 4. Поиск по ID | 5. Сортировка | 6. Выход');
+    stdout.write('Выбор: ');
     final choice = stdin.readLineSync();
 
     switch (choice) {
       case '1':
-        _showNotes(repo.allNotes);
+        _showNotes(repo.all()); // Вызов нового метода all()
         break;
       case '2':
         _addNoteUI(repo);
@@ -36,114 +30,48 @@ void main() {
         _findNoteUI(repo);
         break;
       case '5':
-        _editNoteUI(repo);
-        break;
-      case '6':
-        _filterByTagUI(repo);
-        break;
-      case '7':
         _sortUI(repo);
         break;
-      case '8':
-        print('Завершение работы... До встречи!');
+      case '6':
         isRunning = false;
         break;
-      default:
-        print('! Ошибка: выберите число от 1 до 8.');
     }
   }
 }
 
 void _showNotes(List<Note> notes) {
-  if (notes.isEmpty) {
-    print('\n[ Список заметок пуст ]');
-    return;
-  }
-  print('\n--- СПИСОК ЗАМЕТОК ---');
+  if (notes.isEmpty) return print('Пусто.');
   for (var n in notes) {
-    print('[ID: ${n.id}] ${n.title} | Теги: ${n.tags.join(", ")} | Избранное: ${n.isFavorite ? "★" : "☆"}');
+    print('[ID: ${n.id}] ${n.title}');
   }
 }
 
-void _addNoteUI(NoteRepository repo) {
-  try {
-    stdout.write('Введите ID (число): ');
-    int id = int.parse(stdin.readLineSync() ?? '0');
-    
-    stdout.write('Заголовок: ');
-    String title = stdin.readLineSync() ?? 'Без названия';
-    
-    stdout.write('Текст заметки: ');
-    String content = stdin.readLineSync() ?? '';
-
-    stdout.write('Введите теги через запятую: ');
-    List<String> tags = (stdin.readLineSync() ?? '').split(',').map((e) => e.trim()).toList();
-
-    final newNote = Note(id, title, content, DateTime.now(), false, tags);
-    repo.addNote(newNote);
-  } catch (e) {
-    print('! Ошибка ввода: ID должен быть числом.');
-  }
-}
-
-void _deleteNoteUI(NoteRepository repo) {
-  stdout.write('Введите ID для удаления: ');
-  int? id = int.tryParse(stdin.readLineSync() ?? '');
-  if (id != null) {
-    if (repo.deleteNote(id)) {
-      print('Заметка удалена.');
-    } else {
-      print('! Заметка с таким ID не найдена.');
-    }
-  }
-}
-
-void _findNoteUI(NoteRepository repo) {
-  stdout.write('Введите ID для поиска: ');
-  int? id = int.tryParse(stdin.readLineSync() ?? '');
-  final note = id != null ? repo.findById(id) : null;
+void _addNoteUI(Rep repo) {
+  stdout.write('ID: ');
+  int id = int.parse(stdin.readLineSync() ?? '0');
+  stdout.write('Заголовок: ');
+  String title = stdin.readLineSync() ?? '';
   
-  if (note != null) {
-    print('\nНайдена заметка:');
-    print('Заголовок: ${note.title}');
-    print('Текст: ${note.content}');
-    print('Дата создания: ${note.createdAt}');
-  } else {
-    print('! Заметка не найдена.');
-  }
+  // Создаем и сразу сохраняем в отдельный файл через repo.add()
+  repo.add(Note(id, title, 'Текст', DateTime.now(), false, []));
 }
 
-void _filterByTagUI(NoteRepository repo) {
-  stdout.write('Введите тег для фильтрации: ');
-  String tag = stdin.readLineSync() ?? '';
-  final filtered = repo.filterByTag(tag);
-  _showNotes(filtered);
+void _deleteNoteUI(Rep repo) {
+  stdout.write('ID для удаления: ');
+  int id = int.parse(stdin.readLineSync() ?? '0');
+  repo.del(id); // Вызов del() удалит физический файл
 }
 
-void _sortUI(NoteRepository repo) {
-  print('1. Сортировать по дате (новые сверху)');
-  print('2. Сортировать по алфавиту');
-  final sortChoice = stdin.readLineSync();
-  if (sortChoice == '1') repo.sortByDate();
-  if (sortChoice == '2') repo.sortByTitle();
+void _findNoteUI(Rep repo) {
+  stdout.write('ID для поиска: ');
+  int id = int.parse(stdin.readLineSync() ?? '0');
+  final note = repo.findId(id);
+  if (note != null) print('Найдено: ${note.title}');
 }
 
-void _editNoteUI(NoteRepository repo) {
-  stdout.write('Введите ID заметки для редактирования: ');
-  int? id = int.tryParse(stdin.readLineSync() ?? '');
-  if (id == null) return;
-
-  stdout.write('Новый заголовок (оставьте пустым, чтобы не менять): ');
-  String? title = stdin.readLineSync();
-  title = title?.isEmpty == true ? null : title;
-
-  stdout.write('Сделать избранной? (1 - да, 0 - нет, пусто - не менять): ');
-  String favInput = stdin.readLineSync() ?? '';
-  bool? isFav = favInput == '1' ? true : (favInput == '0' ? false : null);
-
-  if (repo.updateNote(id, title: title, isFavorite: isFav)) {
-    print('Заметка обновлена!');
-  } else {
-    print('! Ошибка при обновлении.');
-  }
+void _sortUI(Rep repo) {
+  print('1. По дате | 2. По алфавиту');
+  final s = stdin.readLineSync();
+  if (s == '1') _showNotes(repo.sortdata());
+  if (s == '2') _showNotes(repo.sorttitle());
 }
