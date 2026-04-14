@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:convert';
-//import 'package:path_provider/path_provider.dart';
 
 
 class FileHelper {
@@ -8,7 +7,6 @@ class FileHelper {
   static void saveNotes(List<Map<String, dynamic>> jsonData) {
     try {
       final file = File(_fileName);
-      // !!!!ТУТ Я ПЫТАЛСЯ ПРЕОБРАЗОВАТЬ В UTF 8 НО ОНО НЕ РАБОТАЕТ ((
       final String content = jsonEncode(jsonData);
       file.writeAsStringSync(content, encoding: utf8); 
     } catch (e) {
@@ -28,4 +26,4 @@ class FileHelper {
     }
     return [];
   }
-}
+} //этот файл нигде не учавствует 

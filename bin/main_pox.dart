@@ -1,14 +1,12 @@
 import 'dart:io';
 import '../lib/models/note.dart';
-import '../lib/servies/note_rep.dart'; // Проверь, чтобы папка называлась именно 'servies
+import '../lib/servies/note_rep.dart'; 
 
 
 void main() {
-  // Важно: тип переменной Rep (интерфейс), а реализация Repository
   final Rep repo = Repository(); 
   bool isRunning = true;
 
-  // Автоматически включаем поддержку UTF-8 в консоли Windows
   
   while (isRunning) {
     print('\n--- МЕНЮ (ПОФАЙЛОВОЕ ХРАНЕНИЕ) ---');
@@ -18,7 +16,7 @@ void main() {
 
     switch (choice) {
       case '1':
-        _showNotes(repo.all()); // Вызов нового метода all()
+        _showNotes(repo.all()); 
         break;
       case '2':
         _addNoteUI(repo);
@@ -52,14 +50,14 @@ void _addNoteUI(Rep repo) {
   stdout.write('Заголовок: ');
   String title = stdin.readLineSync() ?? '';
   
-  // Создаем и сразу сохраняем в отдельный файл через repo.add()
+ 
   repo.add(Note(id, title, 'Текст', DateTime.now(), false, []));
 }
 
 void _deleteNoteUI(Rep repo) {
   stdout.write('ID для удаления: ');
   int id = int.parse(stdin.readLineSync() ?? '0');
-  repo.del(id); // Вызов del() удалит физический файл
+  repo.del(id); 
 }
 
 void _findNoteUI(Rep repo) {
@@ -74,4 +72,6 @@ void _sortUI(Rep repo) {
   final s = stdin.readLineSync();
   if (s == '1') _showNotes(repo.sortdata());
   if (s == '2') _showNotes(repo.sorttitle());
+  
 }
+//изменен не до конца
