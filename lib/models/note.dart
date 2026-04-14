@@ -1,5 +1,5 @@
 class Note {
-  int id; // Убираем приватность для удобства работы с файловой системой
+  int id; 
   String title;
   String content;
   DateTime createdAt;
